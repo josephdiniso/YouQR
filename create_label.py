@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from typing import List
+import argparse
 
 import numpy as np
 import cv2
@@ -35,7 +36,7 @@ def calculate_ratios(scale: float, heights: List[float]):
         heights (List[float]): List of heights of bars
 
     Returns:
-
+        List[str]: List of b64 encoded characters
     """
     ratios = []
     new_scale = 0.4

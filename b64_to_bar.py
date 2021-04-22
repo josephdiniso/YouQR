@@ -12,6 +12,7 @@ for index, letter in enumerate(ascii_lowercase):
 for i in range(1, 10):
     lookup_table[str(i)] = i + 52
 
+#TODO add '-' support
 lookup_table["+"] = 62
 lookup_table["/"] = 63
 
