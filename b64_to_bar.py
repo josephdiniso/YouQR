@@ -18,31 +18,19 @@ lookup_table["/"] = 63
 inv_lookup = {v: k for k, v in lookup_table.items()}
 
 
-def b64_to_int(code: str) -> List[int]:
+def b64_to_bar(text: str) -> List[int]:
     """
-    Takes in a b64 string and converts it to a list of integers
-    Args:
-        code (str): B64 string
-
-    Returns:
-        (List[int]) List of integers converted from b64 to b10
-    """
-    int_conversion = []
-    for letter in code:
-        int_conversion.append(lookup_table[letter])
-    return int_conversion
-
-
-def b10_to_bar(code: List[int]) -> List[int]:
-    """
-    Takes in a list of b10 integers and converts it to a list of octal integers
+    Takes in a string of b64 values and converts it to a list of octal integers
     with a zero padded length of 2
     Args:
-        code (List[int]): List of b10 integers
+        text (str): b64 text
 
     Returns:
         (List[int]) List of zero padded to length to octal integers
     """
+    code = []
+    for letter in text:
+        code.append(lookup_table[letter])
     bars = []
     for number in code:
         int_val = str(oct(number))[2:]
@@ -75,9 +63,8 @@ def bar_to_b64(code: List[int]) -> List[int]:
 
 
 def main():
-    code = b64_to_int("LC254Hk")
-    bars = b10_to_bar(code)
-    bar_to_b64(bars)
+    bar_rev = b64_to_bar("LC254Hk")
+    bar_to_b64(bar_rev)
 
 
 if __name__ == "__main__":
