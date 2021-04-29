@@ -64,7 +64,8 @@ def calculate_ratios(heights: List[float]) -> List[int]:
     for height in heights:
         ratio = height / max(heights)
         ratios.append(round(ratio * 8) - 1)
-    return bar_to_b64(ratios)
+    b64_values = bar_to_b64(ratios)
+    return b64_values
 
 
 def analyze_bar(src: np.array) -> List[str]:

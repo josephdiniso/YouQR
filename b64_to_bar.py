@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import List
+from typing import List, Optional
 from string import ascii_lowercase, ascii_uppercase
 
 
@@ -55,7 +55,7 @@ def b64_to_bar(text: str) -> List[int]:
     return bars
 
 
-def bar_to_b64(code: List[int]) -> List[int]:
+def bar_to_b64(code: List[int]) -> Optional[List[str]]:
     """
     Takes in a list of octal integers and converts them in pairs of two to b64
     values
@@ -64,10 +64,14 @@ def bar_to_b64(code: List[int]) -> List[int]:
         number
 
     Returns:
-        (List[int]) List of b64 converted values
+        (List[str]) List of b64 converted values or None if the list of integers is invalid
     """
     b64_list = []
+    if len(code) % 2 != 0:
+        return None
     for i in range(0, len(code), 2):
+        if code[i] < 0 or code[i] > 7 or code[i + 1] < 0 or code[i + 1] > 7:
+            return None
         b10 = int((str(code[i]) + str(code[i + 1])), 8)
         b64_list.append(inv_lookup[b10])
     return b64_list

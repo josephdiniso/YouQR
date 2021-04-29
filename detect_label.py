@@ -27,10 +27,10 @@ def analyze_contours(frame: np.array, contours: List) -> List:
                 cv2.drawContours(frame, [cnt], 0, (0, 255, 0), 3)
                 cropped = frame[y1:y1 + h, x:x + w]
                 b64_values = None
-                try:
-                    b64_values = analyze_bar(cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY))
-                except ...:
-                    pass
+                # try:
+                b64_values = analyze_bar(cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY))
+                # except:
+                #     pass
                 return b64_values
 
 
