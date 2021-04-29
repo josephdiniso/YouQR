@@ -118,7 +118,7 @@ def generate_bar_from_code(text: str):
 def main():
     bars = generate_bar_from_code("-RmGHFRcqAU")
     cv2.imwrite("Bars.png", bars.img)
-    analyze_bar(bars.img)
+    # analyze_bar(bars.img)
 
 
 if __name__ == "__main__":

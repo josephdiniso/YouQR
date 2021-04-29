@@ -65,9 +65,19 @@ def detect_rectangle(src: np.array):
 def get_webcam_img():
     cap = cv2.VideoCapture(0)
     while True:
-        _, frame = cap.read()
+        ret, frame = cap.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        cv2.imshow('frame', gray)
+        th3 = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        contours, h = cv2.findContours(th3, 1, 2)
+        for cnt in contours:
+            approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
+            if len(approx) == 4:
+                x, y1, w, h = cv2.boundingRect(cnt)
+
+                # Check for correct ratio
+                if 1.8 < w / h < 2.2 and frame.size*0.01 < w * h < frame.size * 0.8:
+                    cv2.drawContours(frame, [cnt], 0, (0, 255, 0), 3)
+        cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cap.release()
@@ -78,13 +88,12 @@ def get_webcam_img():
 
 def main():
     img = get_webcam_img()
-    # img = cv2.imread("webcam3.png", 0)
     # img = add_rectangle(img)
     cv2.imshow("Original", img)
-    res = detect_rectangle(img)
-    if res is not None:
-        print(analyze_bar(res))
-    cv2.waitKey(0)
+    # res = detect_rectangle(img)
+    # if res is not None:
+    #     print(analyze_bar(res))
+    # cv2.waitKey(0)
 
 
 if __name__ == "__main__":
