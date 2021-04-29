@@ -12,11 +12,12 @@ for index, letter in enumerate(ascii_lowercase):
 for i in range(1, 10):
     lookup_table[str(i)] = i + 52
 
-#TODO add '-' support
+# TODO add '-' support
 lookup_table["+"] = 62
 lookup_table["/"] = 63
 
 inv_lookup = {v: k for k, v in lookup_table.items()}
+inv_lookup[52] = "0"
 
 
 def b64_to_bar(text: str) -> List[int]:
@@ -55,12 +56,11 @@ def bar_to_b64(code: List[int]) -> List[int]:
     Returns:
         (List[int]) List of b64 converted values
     """
-    b10_list = []
-    print(code)
+    b64_list = []
     for i in range(0, len(code), 2):
-        b10 = int(str(code[i]) + str(code[i + 1]), 8)
-        b10_list.append(inv_lookup[b10])
-    print(b10_list)
+        b10 = int((str(code[i]) + str(code[i + 1])), 8)
+        b64_list.append(inv_lookup[b10])
+    return b64_list
 
 
 def main():

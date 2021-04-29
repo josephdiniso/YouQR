@@ -22,55 +22,54 @@ def add_rectangle(src: np.array):
 
 
 def max_crop(crops: List) -> np.array:
+    """
+    Gets the largest crop in a list of images
+    Args:
+        crops (List): List of np.arrays (images)
+
+    Returns:
+        np.array: Largest crop
+    """
     max_size = 0
     biggest_crop = None
     for crop in crops:
         if crop.size > max_size:
+            max_size = crop.size
             biggest_crop = crop
     return biggest_crop
 
 
+# TODO: Add checks for flipped bars and make sure that a crop if valid by checking if it has valid bars
 def detect_rectangle(src: np.array):
     # Detect label rectangle in the image
     th3 = cv2.adaptiveThreshold(src, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    cv2.imshow("th3", th3)
     contours, h = cv2.findContours(th3, 1, 2)
     detected = 0
     crops = []
     for cnt in contours:
         approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
         if len(approx) == 4:
-            x, y1, w, y2 = cv2.boundingRect(cnt)
+            x, y1, w, h = cv2.boundingRect(cnt)
 
             # Check for correct ratio
-            if 1.8 < w / y2 < 2.2:
+            if 1.8 < w / h < 2.2:
                 detected += 1
-                cropped = src[y1:y1 + y2, x:x + w]
+                cropped = src[y1:y1 + h, x:x + w]
                 crops.append(cropped)
-                # This cropped section will be sent to the detect bars function
-                # cv2.imshow("cropped", cropped)
-                # cv2.waitKey(0)
     print("Detected: ", detected)
     crop = max_crop(crops)
-    cv2.imshow("Crop", crop)
     return crop
 
 
+# TODO: Add visual rectangle support
 def get_webcam_img():
     cap = cv2.VideoCapture(0)
     while True:
-        # Capture frame-by-frame
         _, frame = cap.read()
-
-        # Our operations on the frame come here
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        # Display the resulting frame
         cv2.imshow('frame', gray)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
-    # When everything done, release the capture
     cap.release()
     cv2.destroyAllWindows()
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -78,12 +77,13 @@ def get_webcam_img():
 
 
 def main():
-    # img = get_webcam_img()
-    img = cv2.imread("test2.jpg", 0)
+    img = get_webcam_img()
+    # img = cv2.imread("webcam.png", 0)
     # img = add_rectangle(img)
     cv2.imshow("Original", img)
     res = detect_rectangle(img)
-    analyze_bar(res)
+    if res is not None:
+        print(analyze_bar(res))
     cv2.waitKey(0)
 
 
