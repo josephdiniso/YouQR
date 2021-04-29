@@ -57,7 +57,6 @@ def bar_to_b64(code: List[int]) -> List[int]:
         (List[int]) List of b64 converted values
     """
     b64_list = []
-    print("CODE:", code)
     for i in range(0, len(code), 2):
         b10 = int((str(code[i]) + str(code[i + 1])), 8)
         b64_list.append(inv_lookup[b10])
