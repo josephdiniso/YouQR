@@ -11,21 +11,27 @@ from b64_to_bar import b64_to_bar, bar_to_b64
 
 class BarGenerator:
     # Configuration
-    height = 300  # 100%
+    height = 300
     bar_width = 15
     space_between_bars = 10
-    color = (0, 0, 0)
-    img = np.full((400, 1000, 3), 255, dtype=np.uint8)
 
-    def __init__(self):
-        pass
+    def __init__(self, nums):
+        self.img = np.full((self.height, self.bar_width * (len(nums) + 3) +
+                            self.space_between_bars * (len(nums) + 3) + 45), 255,
+                           dtype=np.uint8)
+        self.draw_bar(1, 0.9)
+        self.draw_bar(len(nums) + 2, 0.9)
+        self.draw_bar(len(nums) + 3, 0.9)
+        for index, x in enumerate(nums):
+            self.draw_bar(index + 2, 0.05 * (x + 1))
 
     def draw_bar(self, bar_index, bar_height):
+        # Bar height is a percentage of the total height
         bar_height = int(bar_height * self.height)
-        y = int((self.height - bar_height) / 2)
-        start_point = (bar_index * (self.space_between_bars + self.bar_width), y)
-        end_point = (start_point[0] + self.bar_width, bar_height + y)
-        cv2.rectangle(self.img, start_point, end_point, self.color, -1)
+        start_point = (bar_index * (self.space_between_bars + self.bar_width),
+                       self.height // 2 - bar_height // 2)
+        end_point = (start_point[0] + self.bar_width, self.height // 2 + bar_height // 2)
+        cv2.rectangle(self.img, start_point, end_point, 0, -1)
 
 
 def calculate_ratios(heights: List[float]):
@@ -41,23 +47,8 @@ def calculate_ratios(heights: List[float]):
     """
     ratios = []
     for height in heights:
-        ratio = height / 0.91
-        if 0 < ratio <= 0.125:
-            ratios.append(0)
-        elif 0.125 < ratio <= 0.26:
-            ratios.append(1)
-        elif 0.26 < ratio <= 0.381:
-            ratios.append(2)
-        elif 0.381 < ratio <= 0.5:
-            ratios.append(3)
-        elif 0.5 < ratio <= 0.625:
-            ratios.append(4)
-        elif 0.625 < ratio <= 0.75:
-            ratios.append(5)
-        elif 0.75 < ratio <= 0.875:
-            ratios.append(6)
-        elif 0.875 < ratio:
-            ratios.append(7)
+        ratio = height / max(heights)
+        ratios.append(round(ratio * 8) - 1)
     return bar_to_b64(ratios)
 
 
@@ -88,8 +79,6 @@ def analyze_bar(src: np.array) -> List[str]:
         bottom = (cnt[cnt[:, :, 1].argmax()])[0][1]
         x = (cnt[cnt[:, :, 0].argmax()][0])[0]
         height = round((bottom - top) / img_height, 5)
-        if height < 0.05 or height > 0.99:
-            continue
         count += 1
         org = (x, img_height - 40)
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -105,7 +94,8 @@ def analyze_bar(src: np.array) -> List[str]:
     sorted_bars_final = [bar for _, bar in sorted_bars]
     print(sorted_bars_final)
     print(len(sorted_bars_final))
-    b64_values = calculate_ratios(sorted_bars_final)
+    b64_values = calculate_ratios(sorted_bars_final[1:-3])
+    print(b64_values)
     return b64_values
 
 
@@ -121,19 +111,14 @@ def generate_bar_from_code(text: str):
         None
     """
     nums = b64_to_bar(text)
-    bars = BarGenerator()
-    bars.draw_bar(0, 0.9)
-    bars.draw_bar(len(nums) + 1, 0.9)
-    bars.draw_bar(len(nums) + 2, 0.9)
-    for index, x in enumerate(nums):
-        bars.draw_bar(index + 1, 0.8 * (x + 1))
+    bars = BarGenerator(nums)
     return bars
 
 
 def main():
     bars = generate_bar_from_code("-RmGHFRcqAU")
     cv2.imwrite("Bars.png", bars.img)
-    # analyze_bar(cv2.cvtColor(bars.img, cv2.COLOR_BGR2GRAY))
+    analyze_bar(bars.img)
 
 
 if __name__ == "__main__":
