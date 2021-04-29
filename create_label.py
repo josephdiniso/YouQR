@@ -65,37 +65,27 @@ def analyze_bar(src: np.array) -> List[str]:
     # Detecting Bar's height
 
     src = cv2.resize(src, (300, 150))
+    # Cuts edges of image
     src = src[10:-10, 10:-10]
-    cv2.imshow("src", src)
-    img = src
     thresh = cv2.adaptiveThreshold(src, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 9, 5)
     contours, h = cv2.findContours(thresh, 1, 2)
     bar_heights = []
     img_height, img_width = src.shape
     x_vals = []
-    count = 0
     for cnt in contours:
         top = (cnt[cnt[:, :, 1].argmin()])[0][1]
         bottom = (cnt[cnt[:, :, 1].argmax()])[0][1]
         x = (cnt[cnt[:, :, 0].argmax()][0])[0]
         height = round((bottom - top) / img_height, 5)
-        count += 1
-        org = (x, img_height - 40)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        img = cv2.putText(img, str(height), org, font, 0.30, 0)
         bar_heights.append(height)
         # This is stored so that we can sort bar heights based on their respective x value
         x_vals.append(x)
     # This sorts the bar heights based on their respective x position as the contours do not
     # automatically sort from left to right
-    cv2.waitKey(0)
     sorted_bars = zip(x_vals, bar_heights)
     sorted_bars = sorted(sorted_bars)
     sorted_bars_final = [bar for _, bar in sorted_bars]
-    print(sorted_bars_final)
-    print(len(sorted_bars_final))
     b64_values = calculate_ratios(sorted_bars_final[1:-3])
-    print(b64_values)
     return b64_values
 
 

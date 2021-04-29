@@ -44,13 +44,14 @@ def detect_rectangle(src: np.array):
     # Detect label rectangle in the image
     th3 = cv2.adaptiveThreshold(src, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     contours, h = cv2.findContours(th3, 1, 2)
+    cv2.imshow("thresh", th3)
+    cv2.waitKey(0)
     detected = 0
     crops = []
     for cnt in contours:
         approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
         if len(approx) == 4:
             x, y1, w, h = cv2.boundingRect(cnt)
-
             # Check for correct ratio
             if 1.8 < w / h < 2.2:
                 detected += 1
@@ -73,7 +74,6 @@ def get_webcam_img():
             approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
             if len(approx) == 4:
                 x, y1, w, h = cv2.boundingRect(cnt)
-
                 # Check for correct ratio
                 if 1.8 < w / h < 2.2 and frame.size*0.01 < w * h < frame.size * 0.8:
                     cv2.drawContours(frame, [cnt], 0, (0, 255, 0), 3)
@@ -90,10 +90,10 @@ def main():
     img = get_webcam_img()
     # img = add_rectangle(img)
     cv2.imshow("Original", img)
-    # res = detect_rectangle(img)
-    # if res is not None:
-    #     print(analyze_bar(res))
-    # cv2.waitKey(0)
+    res = detect_rectangle(img)
+    if res is not None:
+        print(analyze_bar(res))
+    cv2.waitKey(0)
 
 
 if __name__ == "__main__":
