@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-from math import ceil
 from typing import List
-import argparse
 
 import numpy as np
 import cv2
@@ -10,12 +8,20 @@ from b64_to_bar import b64_to_bar, bar_to_b64
 
 
 class BarGenerator:
-    # Configuration
+    """
+    BarGenerator object which takes in a list of numbers, which are the octal representations
+    of a YouTube embedded URL
+    """
     height = 300
     bar_width = 15
     space_between_bars = 10
 
-    def __init__(self, nums):
+    def __init__(self, nums: List[int]):
+        """
+        Draws the corresponding bars according to the constructors list of nums
+        Args:
+            nums (List[int]): List of octal integers to draw corresponding bars from
+        """
         self.img = np.full((self.height, self.bar_width * (len(nums) + 3) +
                             self.space_between_bars * (len(nums) + 3) + 45), 255,
                            dtype=np.uint8)
@@ -25,7 +31,16 @@ class BarGenerator:
         for index, x in enumerate(nums):
             self.draw_bar(index + 2, 0.05 * (x + 1))
 
-    def draw_bar(self, bar_index, bar_height):
+    def draw_bar(self, bar_index, bar_height) -> None:
+        """
+        Draws a bar on the self.img
+        Args:
+            bar_index (int): Represents which bar to draw (corresponds to width of image)
+            bar_height (float): Percentage of total image height
+
+        Returns:
+            None
+        """
         # Bar height is a percentage of the total height
         bar_height = int(bar_height * self.height)
         start_point = (bar_index * (self.space_between_bars + self.bar_width),
@@ -34,7 +49,7 @@ class BarGenerator:
         cv2.rectangle(self.img, start_point, end_point, 0, -1)
 
 
-def calculate_ratios(heights: List[float]):
+def calculate_ratios(heights: List[float]) -> List[int]:
     """
     Given a list of floats representing the height of the bars, these values are converted to their
     original base-64 encoding.
@@ -63,7 +78,6 @@ def analyze_bar(src: np.array) -> List[str]:
         List[int] List of b64 characters converted from the image
     """
     # Detecting Bar's height
-
     src = cv2.resize(src, (300, 150))
     # Cuts edges of image
     src = src[10:-10, 10:-10]
@@ -89,7 +103,7 @@ def analyze_bar(src: np.array) -> List[str]:
     return b64_values
 
 
-def generate_bar_from_code(text: str):
+def generate_bar_from_code(text: str) -> BarGenerator:
     """
     Receives a string of b64 characters and generates an image with bars accordingly.
     The image will have one ground truth bar in the beginning and two at the
@@ -106,7 +120,7 @@ def generate_bar_from_code(text: str):
 
 
 def main():
-    bars = generate_bar_from_code("-RmGHFRcqAU")
+    bars = generate_bar_from_code("8AHCfZTRGiI")
     cv2.imwrite("Bars.png", bars.img)
     print(analyze_bar(bars.img))
 

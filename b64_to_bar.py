@@ -2,22 +2,32 @@
 from typing import List
 from string import ascii_lowercase, ascii_uppercase
 
-lookup_table = {}
-for index, letter in enumerate(ascii_uppercase):
-    lookup_table[letter] = index
 
-for index, letter in enumerate(ascii_lowercase):
-    lookup_table[letter] = index + 26
+def make_lookup():
+    """
+    Called always, generates global lookup and inverse to convert from base64 to int
+    Returns:
+        None
+    """
+    global lookup_table
+    global inv_lookup
+    if "lookup_table" not in globals():
+        lookup_table = {}
+    if "inv_lookup" not in globals():
+        inv_lookup = {}
+    for index, letter in enumerate(ascii_uppercase):
+        lookup_table[letter] = index
 
-for i in range(1, 10):
-    lookup_table[str(i)] = i + 52
+    for index, letter in enumerate(ascii_lowercase):
+        lookup_table[letter] = index + 26
 
-# TODO add '-' support
-lookup_table["-"] = 62
-lookup_table["/"] = 63
-
-inv_lookup = {v: k for k, v in lookup_table.items()}
-inv_lookup[52] = "0"
+    for i in range(1, 10):
+        lookup_table[str(i)] = i + 52
+    lookup_table["-"] = 62
+    lookup_table["/"] = 63
+    # Generates inverse lookup
+    inv_lookup = {v: k for k, v in lookup_table.items()}
+    inv_lookup[52] = "0"
 
 
 def b64_to_bar(text: str) -> List[int]:
@@ -69,4 +79,7 @@ def main():
 
 
 if __name__ == "__main__":
+    make_lookup()
     main()
+else:
+    make_lookup()

@@ -8,43 +8,19 @@ import webbrowser
 from create_label import analyze_bar
 
 
-def add_rectangle(src: np.array):
-    # Adding a digital rectangle to the test image
-    start_point = (100, 300)
-    end_point = (300, 400)
-    black = (0, 0, 0)
-    white = (255, 255, 255)
-    cv2.rectangle(src, start_point, end_point, white, -1)
-    # cv2.rectangle(src, (50, 250), (350, 450), white, -1)
-    cv2.rectangle(src, start_point, end_point, black, 0)
-
-    cv2.putText(src, 'TEST', (120, 310), cv2.FONT_HERSHEY_SIMPLEX, 0.30, (0, 0, 0))
-    return src
-
-
-def max_crop(crops: List) -> np.array:
+def analyze_contours(frame: np.array, contours: List) -> List:
     """
-    Gets the largest crop in a list of images
+    Iterates through the list of contours and determined if they are a viable code
     Args:
-        crops (List): List of np.arrays (images)
+        frame (np.array): Image to analyze for eligible code
+        contours (List): List of contours to receive rectangles from
 
     Returns:
-        np.array: Largest crop
+        List of b64 coded values if a eligible code is found, otherwise None
     """
-    max_size = 0
-    biggest_crop = None
-    for crop in crops:
-        if crop.size > max_size:
-            max_size = crop.size
-            biggest_crop = crop
-    return biggest_crop
-
-
-def analyze_contours(frame: np.array, contours: List):
     for cnt in contours:
         approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
         if len(approx) == 4:
-            failure = False
             x, y1, w, h = cv2.boundingRect(cnt)
             # Check for correct ratio
             if 1.8 < w / h < 2.2 and frame.size * 0.01 < w * h < frame.size * 0.8:
@@ -53,16 +29,21 @@ def analyze_contours(frame: np.array, contours: List):
                 b64_values = None
                 try:
                     b64_values = analyze_bar(cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY))
-                except KeyError:
-                    failure = True
-                except ValueError:
-                    failure = True
-                except IndexError:
-                    failure = True
+                except ...:
+                    pass
                 return b64_values
 
 
 def get_webcam_values():
+    """
+    Opens webcam and displays live webcam image to the user. If contours are found after
+    thresholding and passed to the analyze_contours() function along with the current frame.
+    If analyze_contours() returns a non NoneType value then it breaks its loop and returns
+    the list of b64 values to open a browser with.
+
+    Returns:
+        (List) b64 values as a list of strings
+    """
     cap = cv2.VideoCapture(0)
     failure = False
     b64_values = None
@@ -79,7 +60,6 @@ def get_webcam_values():
             break
     cap.release()
     cv2.destroyAllWindows()
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     return b64_values
 
 
