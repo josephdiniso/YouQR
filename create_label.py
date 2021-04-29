@@ -41,14 +41,14 @@ def calculate_ratios(heights: List[float]):
     """
     ratios = []
     for height in heights:
-        ratio = height / 0.4
+        ratio = height / 0.91
         if 0 < ratio <= 0.125:
             ratios.append(0)
-        elif 0.125 < ratio <= 0.25:
+        elif 0.125 < ratio <= 0.26:
             ratios.append(1)
-        elif 0.25 < ratio <= 0.375:
+        elif 0.26 < ratio <= 0.381:
             ratios.append(2)
-        elif 0.375 < ratio <= 0.5:
+        elif 0.381 < ratio <= 0.5:
             ratios.append(3)
         elif 0.5 < ratio <= 0.625:
             ratios.append(4)
@@ -56,7 +56,7 @@ def calculate_ratios(heights: List[float]):
             ratios.append(5)
         elif 0.75 < ratio <= 0.875:
             ratios.append(6)
-        elif 0.875 < ratio <= 1:
+        elif 0.875 < ratio:
             ratios.append(7)
     return bar_to_b64(ratios)
 
@@ -72,10 +72,11 @@ def analyze_bar(src: np.array) -> List[str]:
         List[int] List of b64 characters converted from the image
     """
     # Detecting Bar's height
+
     src = cv2.resize(src, (300, 150))
     src = src[10:-10, 10:-10]
+    cv2.imshow("src", src)
     img = src
-    # _, thresh = cv2.threshold(src, 127, 255, 1)
     thresh = cv2.adaptiveThreshold(src, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 9, 5)
     contours, h = cv2.findContours(thresh, 1, 2)
     bar_heights = []
@@ -86,8 +87,8 @@ def analyze_bar(src: np.array) -> List[str]:
         top = (cnt[cnt[:, :, 1].argmin()])[0][1]
         bottom = (cnt[cnt[:, :, 1].argmax()])[0][1]
         x = (cnt[cnt[:, :, 0].argmax()][0])[0]
-        height = round((bottom - top) / img_height, 2)
-        if height > 0.9:
+        height = round((bottom - top) / img_height, 5)
+        if height < 0.05 or height > 0.99:
             continue
         count += 1
         org = (x, img_height - 40)
@@ -103,7 +104,8 @@ def analyze_bar(src: np.array) -> List[str]:
     sorted_bars = sorted(sorted_bars)
     sorted_bars_final = [bar for _, bar in sorted_bars]
     print(sorted_bars_final)
-    b64_values = calculate_ratios(sorted_bars_final[1:-2])
+    print(len(sorted_bars_final))
+    b64_values = calculate_ratios(sorted_bars_final)
     return b64_values
 
 
@@ -119,20 +121,19 @@ def generate_bar_from_code(text: str):
         None
     """
     nums = b64_to_bar(text)
-    print(nums)
     bars = BarGenerator()
     bars.draw_bar(0, 0.9)
     bars.draw_bar(len(nums) + 1, 0.9)
     bars.draw_bar(len(nums) + 2, 0.9)
     for index, x in enumerate(nums):
-        bars.draw_bar(index + 1, 0.05 * (x + 1))
+        bars.draw_bar(index + 1, 0.8 * (x + 1))
     return bars
 
 
 def main():
-    bars = generate_bar_from_code("OcHuxFJvKmI")
+    bars = generate_bar_from_code("-RmGHFRcqAU")
     cv2.imwrite("Bars.png", bars.img)
-    analyze_bar(cv2.cvtColor(bars.img, cv2.COLOR_BGR2GRAY))
+    # analyze_bar(cv2.cvtColor(bars.img, cv2.COLOR_BGR2GRAY))
 
 
 if __name__ == "__main__":

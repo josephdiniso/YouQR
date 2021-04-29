@@ -77,8 +77,8 @@ def get_webcam_img():
 
 
 def main():
-    img = get_webcam_img()
-    # img = cv2.imread("webcam.png", 0)
+    # img = get_webcam_img()
+    img = cv2.imread("webcam3.png", 0)
     # img = add_rectangle(img)
     cv2.imshow("Original", img)
     res = detect_rectangle(img)
