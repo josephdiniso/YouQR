@@ -63,7 +63,8 @@ def calculate_ratios(heights: List[float]) -> List[int]:
     ratios = []
     for height in heights:
         ratio = height / max(heights)
-        ratios.append(round(ratio * 8) - 1)
+        val = round(ratio * 8) - 1
+        ratios.append(int(val))
     b64_values = bar_to_b64(ratios)
     return b64_values
 
