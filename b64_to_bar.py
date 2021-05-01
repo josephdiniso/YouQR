@@ -72,8 +72,11 @@ def bar_to_b64(code: List[int]) -> Optional[List[str]]:
     for i in range(0, len(code), 2):
         if code[i] < 0 or code[i] > 7 or code[i + 1] < 0 or code[i + 1] > 7:
             return None
-        b10 = int((str(code[i]) + str(code[i + 1])), 8)
-        b64_list.append(inv_lookup[b10])
+        try:
+            b10 = int((str(code[i]) + str(code[i + 1])), 8)
+            b64_list.append(inv_lookup[b10])
+        except ValueError:
+            pass
     return b64_list
 
 

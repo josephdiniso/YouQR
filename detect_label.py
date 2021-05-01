@@ -26,11 +26,7 @@ def analyze_contours(frame: np.array, contours: List) -> List:
             if 1.8 < w / h < 2.2 and frame.size * 0.01 < w * h < frame.size * 0.8:
                 cv2.drawContours(frame, [cnt], 0, (0, 255, 0), 3)
                 cropped = frame[y1:y1 + h, x:x + w]
-                b64_values = None
-                # try:
                 b64_values = analyze_bar(cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY))
-                # except:
-                #     pass
                 return b64_values
 
 
