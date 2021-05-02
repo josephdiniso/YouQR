@@ -64,7 +64,7 @@ def main():
     url_str = ""
     url_str = url_str.join(url_encoding)
     url = "https://youtu.be/" + url_str
-    webbrowser.get("google-chrome").open(url)
+    webbrowser.get().open(url)
 
 
 if __name__ == "__main__":
