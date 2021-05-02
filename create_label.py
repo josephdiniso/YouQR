@@ -3,6 +3,9 @@ from typing import List
 
 import numpy as np
 import cv2
+import requests
+import sys
+import re
 
 from b64_to_bar import b64_to_bar, bar_to_b64
 
@@ -15,6 +18,7 @@ class BarGenerator:
     height = 300
     bar_width = 15
     space_between_bars = 10
+    
 
     def __init__(self, nums: List[int]):
         """
@@ -30,6 +34,13 @@ class BarGenerator:
         self.draw_bar(len(nums) + 3, 0.9)
         for index, x in enumerate(nums):
             self.draw_bar(index + 2, 0.05 * (x + 1))
+        
+        # Draw outer rectangle
+        x1 = 0
+        y1 = 0
+        x2 = self.img.shape[1]
+        y2 = self.img.shape[0]
+        cv2.rectangle(self.img, (x1,y1), (x2,y2), 1, 10)
 
     def draw_bar(self, bar_index, bar_height) -> None:
         """
@@ -120,12 +131,31 @@ def generate_bar_from_code(text: str) -> BarGenerator:
     bars = BarGenerator(nums)
     return bars
 
-
 def main():
-    bars = generate_bar_from_code("8AHCfZTRGiI")
-    cv2.imwrite("Bars.png", bars.img)
-    print(analyze_bar(bars.img))
-
+    n_arg = len(sys.argv)
+    if n_arg==2:
+        # Verify if 2 arguments passed
+        video_id = sys.argv[1]
+        resp = requests.get('https://wnewsome.com/youtube_api/?id='+video_id)
+        if (resp.json()["valid"]):
+            # At this point, the video Id has been validated from the API
+            video_title = resp.json()["title"]
+            print("Video title: "+video_title)
+            bars = generate_bar_from_code(video_id)
+            print(analyze_bar(bars.img[0:]))
+            
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            textsize = cv2.getTextSize(video_title, font, 1, 2)[0]
+            textX = int((bars.img.shape[1] - textsize[0]) / 2)
+            #cv2.putText(bars.img, video_title, (textX, 420 ), font, 1, 0, 2)
+            video_title = re.sub(r"[^a-zA-Z0-9]","_",video_title)
+            video_title = video_title[0:20]
+            cv2.imwrite(video_title+".png", bars.img)
+            
+        else:
+            print("Video ID: "+video_id+" is not valid.")
+    else:
+        print('Need to pass a video ID')
 
 if __name__ == "__main__":
     main()
