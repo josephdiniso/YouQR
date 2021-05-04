@@ -98,6 +98,7 @@ def analyze_bar(src: np.array) -> List[str]:
     bar_heights = []
     img_height, img_width = src.shape
     x_vals = []
+    new_img = cv2.cvtColor(src, cv2.COLOR_GRAY2RGB)
     for cnt in contours:
         top = (cnt[cnt[:, :, 1].argmin()])[0][1]
         bottom = (cnt[cnt[:, :, 1].argmax()])[0][1]
