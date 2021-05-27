@@ -5,7 +5,6 @@ import numpy as np
 import cv2
 import argparse
 import requests
-import sys
 import re
 
 from b64_to_bar import b64_to_bar
