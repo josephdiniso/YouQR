@@ -1,2 +1,10 @@
-image0.jpeg
+# Image types
+*.jpeg
+*.jpg
+*.png
+
+# Directories
+.idea
+
+# Other
 __pycache__
