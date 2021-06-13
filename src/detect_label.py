@@ -30,7 +30,7 @@ def analyze_contours(frame: np.array, contours: List) -> List:
                 return b64_values
 
 
-def get_webcam_values():
+def get_webcam_values() -> List:
     """
     Opens webcam and displays live webcam image to the user. If contours are found after
     thresholding and passed to the analyze_contours() function along with the current frame.
