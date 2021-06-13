@@ -33,7 +33,6 @@ class BarGenerator:
         self.draw_bar(len(nums) + 3, 0.9)
         for index, x in enumerate(nums):
             self.draw_bar(index + 2, 0.05 * (x + 1))
-
         # Draw outer rectangle
         x1 = 0
         y1 = 0
